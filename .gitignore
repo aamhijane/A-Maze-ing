@@ -1,0 +1,10 @@
+# Ignore pycache
+**/__pycache__/
+*.pyc
+
+# Ignore local output files (assuming your OUTPUT_FILE in config is usually maze_*)
+maze_*.txt
+*.log
+
+# Ignore documentation/notes
+documentation.txt
