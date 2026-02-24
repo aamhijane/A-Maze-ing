@@ -83,3 +83,26 @@ class MazeGrid:
         except IOError as e:
             # Centralized error handling as per Operating Directives
             print(f"Critical: Failed to write maze data. {e}")
+
+
+    def set_boundaries(self, entry: Tuple[int, int], exit_coords: Tuple[int, int]) -> None:
+        """
+        Finalizes the maze by opening the entry and exit walls.
+        Ensures compliance with subject requirements for access points.
+        """
+        # entry_x, entry_y
+        ex, ey = entry
+        # exit_x, exit_y
+        xx, xy = exit_coords
+
+        # Guard against out-of-bounds before bit manipulation
+        if (0 <= ex < self.width and 0 <= ey < self.height and 
+            0 <= xx < self.width and 0 <= xy < self.height):
+            
+            # Use bitwise AND NOT to safely clear the bits
+            # North (1) for Entry, South (4) for Exit
+            self.grid[ey][ex] &= ~1
+            self.grid[xy][xx] &= ~4
+        else:
+            # Resilient Design: Log error instead of crashing
+            print("Warning: Entry or Exit coordinates are out of grid bounds.")

@@ -5,13 +5,18 @@ def main() -> None:
     data = parse_config("default.cfg")
     width = data['data']['WIDTH']
     height = data['data']['HEIGHT']
-    entry = data['data']['ENTRY']
+    entry_point = data['data']['ENTRY']
+    exit_point = data['data']['EXIT']
 
     maze = MazeGrid(width, height)
 
-    maze.generate(entry)
+    maze.create_grid()
 
-    maze.save_to_file("maze_result.txt")
+    maze.generate(entry_point)
+
+    maze.set_boundaries(entry_point, exit_point)
+
+    maze.save_to_file("maze.txt")
 
 if __name__ == "__main__":
     main()
