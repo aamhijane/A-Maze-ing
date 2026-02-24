@@ -68,6 +68,18 @@ class MazeGrid:
                 # Backtrack by removing the current room from the stack
                 self.stack.pop()
 
-    def display_raw(self) -> None:
-        for row in self.grid:
-            print(row)
+    def save_to_file(self, filename: str) -> None:
+        """
+        Exports the grid data to a text file.
+        Each line represents a row, with wall values separated by spaces.
+        """
+        try:
+            with open(filename, 'w') as f:
+                for row in self.grid:
+                    # Convert [11, 13, 1] -> "11 13 1"
+                    line = " ".join(map(str, row))
+                    f.write(line + "\n")
+            print(f"Successfully saved maze to {filename}")
+        except IOError as e:
+            # Centralized error handling as per Operating Directives
+            print(f"Critical: Failed to write maze data. {e}")

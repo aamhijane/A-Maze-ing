@@ -11,7 +11,7 @@ def main() -> None:
 
     maze.generate(entry)
 
-    maze.display_raw()
+    maze.save_to_file("maze_result.txt")
 
 if __name__ == "__main__":
     main()
