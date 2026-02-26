@@ -4,10 +4,10 @@ install:
 	.venv/bin/pip install requirements.txt
 
 run:
-	.venv/bin/python a_maze_ing.py $CONFIG_FILE
+	.venv/bin/python a_maze_ing.py $(CONFIG_FILE)
 
 debug:
-	.venv/bin/python -m pdb a_maze_ing.py $CONFIG_FILE
+	.venv/bin/python -m pdb a_maze_ing.py $(CONFIG_FILE)
 
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
