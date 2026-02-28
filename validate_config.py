@@ -1,5 +1,7 @@
-from typing import Dict, Any
+from typing import Dict, List, Any
 from parse_config import config_parsing
+
+import os
 
 
 def convert_to_int(val: str) -> bool:
@@ -21,10 +23,8 @@ def validate(path: str) -> Dict[str, Any]:
     # Check if all required keys exist.
     for k in config_keys:
         if k not in data:
-            return {
-                "status": "fail",
-                "error": f"'{k}': Missing or invalid key."
-            }
+            raise InvalidEntryError(
+                f"Required configuration entry '{k}' is missing.")
 
 
     # Validate data
@@ -35,39 +35,27 @@ def validate(path: str) -> Dict[str, Any]:
 
             # Check if width or height values can't be converted to int.
             if not convert_to_int(v):
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Should be a number."
-                }
+                raise InvalidEntryError(f"Invalid number. Letters and special characters are not allowed for this entry '{k}'.")
 
             config[k] = int(v)
 
             # Check if width or height values is less or equal 0.
             if config[k] <= 0:
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Should be larger than 0."
-                }
+                raise InvalidEntryError(f"'{k}' value must be 1 or higher.")
 
         # Validate entry & exit.
-        if k == 'ENTRY' or k == 'EXIT':
+        elif k == 'ENTRY' or k == 'EXIT':
             coords = data[k].split(',')
 
             # Check if coords not exists or invalid
             if not coords or len(coords) != 2:
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Should have valid (x,y) coordinates."
-                }
+                raise InvalidEntryError(f"Invalid '{k}': Should have valid (x,y) coordinates.")
 
             x, y = coords
 
             # Check if entry or exit values can't be converted to int.
             if not convert_to_int(x) or not convert_to_int(y):
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': (x,y) coordinates should be numbers."
-                }
+                raise InvalidEntryError(f"'{k}' x,y coordinates should not be empty.")
 
             # Store coordinates
             config[k] = (int(x), int(y))
@@ -77,61 +65,51 @@ def validate(path: str) -> Dict[str, Any]:
 
             # Check if entry or exit values is out of bounds.
             if not valid_x or not valid_y:
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': (x,y) coordinates out of bounds."
-                }
+                raise InvalidEntryError(f"'{k}' x,y coordinates are out of bounds.")
 
         # Validate perfect
-        if k == 'PERFECT':
+        elif k == 'PERFECT':
             perfect: str = data[k].lower()
 
             # Check if empty or value not true or false.
             if not perfect or (perfect != 'true' and perfect != 'false'):
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Should be 'True' or 'False'."
-                }
+                raise InvalidEntryError(f"'{k}' entry should be 'True' or 'False'.")
 
             value: bool = True if perfect == 'true' else False
             config[k] = value
 
 
         # Validate output file.
-        if k == 'OUTPUT_FILE':
+        elif k == 'OUTPUT_FILE':
             if not data[k]:
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Coudn't be empty. Provide an output file (eg: maze.txt)."
-                }
+                raise InvalidEntryError(
+                        f"'{k}' entry should not be empty. Provide an output file (eg: maze.txt).")
+
+            _, ext = os.path.splitext(data[k])
+            if ext != '.txt':
+                raise InvalidFileError("The output file must be a plain text (eg: maze.txt)")
 
         # Validate seed.
-        if k == 'SEED':
+        elif k == 'SEED':
 
             if not v:
                 continue
 
             # Check if seed value can't be converted to int.
             if not convert_to_int(v):
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Should be a number."
-                }
+                raise InvalidEntryError(f"'{k}' entry must be a positive number.")
 
             config[k] = int(v)
 
             # Check if seed value is less or equal 0.
             if config[k] <= 0:
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Should be larger than 0."
-                }
+                raise InvalidEntryError(f"'{k}' entry must be 1 or higher.")
 
 
         # Validate algorithm
-        algorithms: List[str] = ['recursive_backtracker', 'prim', 'kruskal', 'eller']
+        elif k == 'ALGORITHM':
+            algorithms: List[str] = ['recursive_backtracker', 'prim', 'kruskal', 'eller']
 
-        if k == 'ALGORITHM':
             if not v:
                 continue
 
@@ -139,24 +117,22 @@ def validate(path: str) -> Dict[str, Any]:
             if v and v in algorithms:
                 config[k] = data[k]
             else:
-                return {
-                    "status": "fail",
-                    "error": f"Invalid '{k}': Shoud be one these: 'recursive_backtracker', 'prim', 'kruskal', 'eller'."
-                }
+                raise InvalidEntryError(
+                        f"'{k}' entry should be one these: '\n- recursive_backtracker\n- prim\n- kruskal\n- eller'.")
+
+        else:
+            raise InvalidEntryError(
+                    f"Configuration file has invalid key: '{k}'")
 
 
     # Check if entry or exit values are equal.
     if config['ENTRY'] == config['EXIT']:
-        return {
-            "status": "fail",
-            "error": f"ENTRY & EXIT coordinates should be not equals."
-        }
+        raise InvalidEntryError(f"The starting(ENTRY) and ending(EXIT) points must be different.")
 
     if 'SEED' not in config.keys():
         config['SEED'] = None
 
     if 'ALGORITHM' not in config.keys():
-        print("DEBUG")
         config['ALGORITHM'] = 'recursive_backtracker'
     
-    return {"status": "success", "data": config}
+    return config
