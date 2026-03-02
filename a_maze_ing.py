@@ -27,18 +27,25 @@ def main() -> None:
         valid_data: Dict[str, Any] = validate(filename)
 
         seed: Any = valid_data["SEED"]
+        width: int = valid_data["WIDTH"]
+        height: int = valid_data["HEIGHT"]
 
         # If SEED exist
         if seed != None:
             random.seed(seed)
 
-        cell_a = mazegen.Cell(0, 0)
+        # cell_a = mazegen.Cell(0, 0)
+        #
+        # cell_a.walls["N"] = True
+        # cell_a.walls["E"] = True
+        # cell_a.walls["S"] = True
 
-        cell_a.walls["N"] = True
-        cell_a.walls["E"] = True
-        cell_a.walls["S"] = True
+        # print(cell_a.to_hex())
 
-        print(cell_a.to_hex())
+        grid = mazegen.Grid(width, height)
+
+        print(grid.cells[-1][-1].x)
+        print(grid.cells[-1][-1].y)
 
     except InvalidEntryError as e:
         print(f"ERROR: {e}")
