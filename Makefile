@@ -18,6 +18,7 @@ debug:
 
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
+	rm -rf ./**/__pycache__ ./**/.mypy_cache ./**/.pytest_cache
 
 lint:
 	$(VENV_PATH)/flake8 .
