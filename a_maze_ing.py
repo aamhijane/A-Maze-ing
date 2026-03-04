@@ -34,18 +34,10 @@ def main() -> None:
         if seed != None:
             random.seed(seed)
 
-        # cell_a = mazegen.Cell(0, 0)
-        #
-        # cell_a.walls["N"] = True
-        # cell_a.walls["E"] = True
-        # cell_a.walls["S"] = True
-
-        # print(cell_a.to_hex())
-
         grid = mazegen.Grid(width, height)
 
-        print(grid.cells[-1][-1].x)
-        print(grid.cells[-1][-1].y)
+        print(grid.cells[-1][-1].walls)
+        print(grid.cells[-1][-1].walls)
 
     except InvalidEntryError as e:
         print(f"ERROR: {e}")
