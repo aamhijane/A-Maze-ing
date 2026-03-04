@@ -1,10 +1,10 @@
-from typing import Dict, List, Any
-from Errors import InvalidEntryError
+from typing import Dict, List
+from Errors import InvalidEntryError, InvalidFileError
 
 import sys
 
 
-def config_parsing(path: str) -> Dict[str, Any]:
+def config_parsing(path: str) -> Dict[str, str]:
     """
     Parse config file data & error handling.
 
@@ -17,7 +17,7 @@ def config_parsing(path: str) -> Dict[str, Any]:
 
     try:
         with open(path, "r") as file:
-            config: Dict[str, Any] = {}
+            config: Dict[str, str] = {}
 
             for line in file:
                 clean_line: str = line.strip()
@@ -40,8 +40,6 @@ def config_parsing(path: str) -> Dict[str, Any]:
         return config
 
     except FileNotFoundError:
-        print(f"ERROR: '{path}' configuration file not exist.")
-        sys.exit(1)
+        raise InvalidFileError(f"'{path}' configuration file not exist.")
     except OSError as e:
-        print(f"ERROR: Something wrong! {e}")
-        sys.exit(1)
+        raise InvalidFileError(f"Unexpected file error: {e}")

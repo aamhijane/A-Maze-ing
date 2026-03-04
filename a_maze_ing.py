@@ -1,8 +1,10 @@
+from typing import Dict, Any
 from validate_config import validate
 from Errors import InvalidEntryError, InvalidFileError, InvalidArgumentError
 
 import sys
 import os
+import random
 
 def main() -> None:
 
@@ -16,15 +18,27 @@ def main() -> None:
         if extension != '.txt':
             raise InvalidFileError("Configuration file must be plain text (eg: config.txt)")
         
-        valid_data = validate(filename)
+        valid_data: Dict[str, Any] = validate(filename)
+
+        seed: Any = valid_data['SEED']
+        # If SEED exist
+        if seed != None:
+            random.seed(seed)
+
+
+
 
         print(valid_data)
+
     except InvalidEntryError as e:
         print(f"ERROR: {e}")
+        sys.exit(1)
     except InvalidArgumentError as e:
         print(f"ERROR: {e}")
+        sys.exit(1)
     except InvalidFileError as e:
         print(f"ERROR: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
