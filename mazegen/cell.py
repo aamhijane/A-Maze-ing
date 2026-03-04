@@ -61,4 +61,3 @@ class Cell:
                 wall[i] = "0"
 
         return HEX[int("".join(reversed(wall)), 2)]
-

@@ -121,4 +121,3 @@ class MazeGenerator:
                     queue.append((neighbor, path + [direction]))
 
         return ""
-

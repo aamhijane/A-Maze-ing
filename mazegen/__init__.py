@@ -20,5 +20,6 @@ Example:
 """
 
 from mazegen.generator import MazeGenerator
+from mazegen.writer import MazeWriter
 
-__all__ = ["MazeGenerator"]
+__all__ = ["MazeGenerator", "MazeWriter"]
