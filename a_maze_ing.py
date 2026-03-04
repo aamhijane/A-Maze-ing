@@ -1,51 +1,52 @@
 from typing import Dict, Any
 from validate_config import validate
 from Errors import InvalidEntryError, InvalidFileError, InvalidArgumentError
+from mazegen import MazeGenerator
 
 import sys
 import os
-import random
-import mazegen
 
 
 def main() -> None:
+    """Entry point for the maze generator program.
 
+    Reads the configuration file path from command-line arguments,
+    validates it, generates a maze, and prints the solution path.
+
+    Raises:
+        InvalidArgumentError: If the wrong number of arguments is provided.
+        InvalidFileError: If the config file has an invalid extension.
+        InvalidEntryError: If the config file contains invalid entries.
+    """
     try:
         if len(sys.argv) != 2:
             raise InvalidArgumentError(
-                "Please provide configuration file as argument. Usage: python3 a_maze_ing.py config.txt"
+                "Usage: python3 a_maze_ing.py config.txt"
             )
 
-        filename = sys.argv[1]
+        filename: str = sys.argv[1]
         _, extension = os.path.splitext(filename)
 
         if extension != ".txt":
             raise InvalidFileError(
-                "Configuration file must be plain text (eg: config.txt)"
+                "Configuration file must be plain text (e.g. config.txt)."
             )
 
-        valid_data: Dict[str, Any] = validate(filename)
+        config: Dict[str, Any] = validate(filename)
 
-        seed: Any = valid_data["SEED"]
-        width: int = valid_data["WIDTH"]
-        height: int = valid_data["HEIGHT"]
+        maze = MazeGenerator(
+            width=config['WIDTH'],
+            height=config['HEIGHT'],
+            seed=config['SEED'],
+            perfect=config['PERFECT'],
+            entry_point=config['ENTRY'],
+            exit_point=config['EXIT']
+        )
 
-        # If SEED exist
-        if seed != None:
-            random.seed(seed)
+        solution = maze.solve()
+        print(solution)
 
-        grid = mazegen.Grid(width, height)
-
-        print(grid.cells[-1][-1].walls)
-        print(grid.cells[-1][-1].walls)
-
-    except InvalidEntryError as e:
-        print(f"ERROR: {e}")
-        sys.exit(1)
-    except InvalidArgumentError as e:
-        print(f"ERROR: {e}")
-        sys.exit(1)
-    except InvalidFileError as e:
+    except (InvalidEntryError, InvalidFileError, InvalidArgumentError) as e:
         print(f"ERROR: {e}")
         sys.exit(1)
 
