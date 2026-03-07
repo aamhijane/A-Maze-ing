@@ -2,7 +2,9 @@ from typing import Dict, Any
 from validate_config import validate
 from Errors import InvalidEntryError, InvalidFileError, InvalidArgumentError
 from mazegen import MazeGenerator, MazeWriter
+from display import display
 
+import curses
 import sys
 import os
 
@@ -45,6 +47,8 @@ def main() -> None:
 
         maze_writer = MazeWriter(maze, config["OUTPUT_FILE"])
         maze_writer.write()
+        curses.wrapper(display, maze)
+        
 
     except (InvalidEntryError, InvalidFileError, InvalidArgumentError) as e:
         print(f"ERROR: {e}")
