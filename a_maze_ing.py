@@ -1,6 +1,10 @@
 from typing import Dict, Any
 from validate_config import validate
-from Errors import InvalidEntryError, InvalidFileError, InvalidArgumentError
+from mazegen.errors import (
+    InvalidEntryError,
+    InvalidFileError,
+    InvalidArgumentError,
+)
 from mazegen import MazeGenerator, MazeWriter
 
 import sys
@@ -43,10 +47,21 @@ def main() -> None:
             exit_point=config['EXIT']
         )
 
+        path: str = maze.solve()
+        if not path:
+            print("WARNING: No solution found for this maze.")
+
+        print("SEED", maze.get_seed())
+
+
         maze_writer = MazeWriter(maze, config["OUTPUT_FILE"])
         maze_writer.write()
 
-    except (InvalidEntryError, InvalidFileError, InvalidArgumentError) as e:
+    except (
+            InvalidEntryError,
+            InvalidFileError,
+            InvalidArgumentError,
+    ) as e:
         print(f"ERROR: {e}")
         sys.exit(1)
 

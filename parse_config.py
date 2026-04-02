@@ -1,5 +1,5 @@
 from typing import Dict, List
-from Errors import InvalidEntryError, InvalidFileError
+from mazegen.errors import InvalidEntryError, InvalidFileError
 
 
 def config_parsing(path: str) -> Dict[str, str]:
@@ -28,7 +28,7 @@ def config_parsing(path: str) -> Dict[str, str]:
                 if not clean_line or clean_line.startswith("#"):
                     continue
 
-                item: List[str] = clean_line.split('=')
+                item: List[str] = clean_line.split('=', 1)
                 if len(item) != 2 or item[1] == '':
                     raise InvalidEntryError(
                         f"This entry '{item[0]}' cannot be empty.")

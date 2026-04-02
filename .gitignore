@@ -1,5 +1,8 @@
-__pycache__/
-.mypy_cache/
-.pytest_cache/
 .venv/
+__pycache__/
+mazegen.egg-info/
+dist/
+.mypy_cache/
 *.pyc
+maze.txt
+test_config.py
