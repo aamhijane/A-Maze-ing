@@ -1,4 +1,5 @@
 from mazegen.generator import MazeGenerator
+from mazegen.errors import InvalidFileError
 
 
 class MazeWriter:
@@ -27,20 +28,23 @@ class MazeWriter:
         exit coordinates, and the shortest path.
         """
 
-        with open(self.output_path, 'w') as file:
-            for row in self.maze.grid.cells:
-                grid_row: str = ""
-                for cell in row:
-                    grid_row += cell.to_hex()
-                file.write(grid_row + "\n")
+        try:
+            with open(self.output_path, 'w') as file:
+                for row in self.maze.grid.cells:
+                    grid_row: str = ""
+                    for cell in row:
+                        grid_row += cell.to_hex()
+                    file.write(grid_row + "\n")
 
-            # Empty line
-            file.write('\n')
+                # Empty line
+                file.write('\n')
 
-            entry_x, entry_y = self.maze.entry_point
-            exit_x, exit_y = self.maze.exit_point
+                entry_x, entry_y = self.maze.entry_point
+                exit_x, exit_y = self.maze.exit_point
 
-            file.write(f"{entry_x},{entry_y}\n")
-            file.write(f"{exit_x},{exit_y}\n")
+                file.write(f"{entry_x},{entry_y}\n")
+                file.write(f"{exit_x},{exit_y}\n")
+                file.write(self.maze.solve() + "\n")
 
-            file.write(self.maze.solve() + "\n")
+        except OSError as e:
+            raise InvalidFileError(f"Could not write output file: {e}")

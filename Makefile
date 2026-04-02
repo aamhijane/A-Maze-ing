@@ -16,6 +16,9 @@ run:
 debug:
 	$(VENV_PATH)/python -m pdb a_maze_ing.py $(CONFIG_FILE)
 
+build:
+	$(VENV_PATH)/python -m build --outdir .
+
 clean:
 	rm -rf __pycache__ .mypy_cache .pytest_cache
 	rm -rf ./**/__pycache__ ./**/.mypy_cache ./**/.pytest_cache

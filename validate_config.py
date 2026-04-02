@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 from parse_config import config_parsing
-from Errors import InvalidEntryError, InvalidFileError
+from mazegen.errors import InvalidEntryError, InvalidFileError
 
 import os
 
@@ -41,9 +41,7 @@ def validate(path: str) -> Dict[str, Any]:
     config: Dict[str, Any] = {}
     data: Dict[str, str] = config_parsing(path)
 
-    VALID_ALGORITHMS: List[str] = [
-        'recursive_backtracker', 'prim', 'kruskal', 'eller'
-    ]
+    VALID_ALGORITHMS: List[str] = ['recursive_backtracker']
     MANDATORY_KEYS: List[str] = [
         'WIDTH', 'HEIGHT', 'ENTRY', 'EXIT', 'OUTPUT_FILE', 'PERFECT'
     ]
@@ -53,16 +51,22 @@ def validate(path: str) -> Dict[str, Any]:
             raise InvalidEntryError(
                 f"Required configuration entry '{k}' is missing.")
 
+    # ✅ FIX: validate WIDTH and HEIGHT FIRST so ENTRY/EXIT bounds check works
+    for k in ('WIDTH', 'HEIGHT'):
+        v = data[k]
+        if not convert_to_int(v):
+            raise InvalidEntryError(
+                f"Invalid number. Letters and special characters "
+                f"are not allowed for '{k}'."
+            )
+        config[k] = int(v)
+        if config[k] <= 0:
+            raise InvalidEntryError(f"'{k}' value must be 1 or higher.")
+
     for k, v in data.items():
 
         if k in ('WIDTH', 'HEIGHT'):
-            if not convert_to_int(v):
-                raise InvalidEntryError(
-                    f"Invalid number. Letters and special characters "
-                    f"are not allowed for '{k}'.")
-            config[k] = int(v)
-            if config[k] <= 0:
-                raise InvalidEntryError(f"'{k}' value must be 1 or higher.")
+            continue
 
         elif k in ('ENTRY', 'EXIT'):
             coords: List[str] = v.split(',')
@@ -105,25 +109,20 @@ def validate(path: str) -> Dict[str, Any]:
             if not v:
                 continue
             if not convert_to_int(v):
-                raise InvalidEntryError(
-                    f"'{k}' must be a positive integer.")
+                raise InvalidEntryError(f"'{k}' must be an integer.")
             config[k] = int(v)
-            if config[k] <= 0:
-                raise InvalidEntryError(
-                    f"'{k}' must be 1 or higher.")
 
         elif k == 'ALGORITHM':
             if not v:
                 continue
             if v not in VALID_ALGORITHMS:
                 raise InvalidEntryError(
-                    f"'{k}' must be one of: "
+                    f"All available algorithms: "
                     f"{', '.join(VALID_ALGORITHMS)}.")
             config[k] = v
 
         else:
-            raise InvalidEntryError(
-                f"Configuration file has invalid key: '{k}'.")
+            print(f"WARNING: Unknown configuration key '{k}' — ignored.")
 
     if config['ENTRY'] == config['EXIT']:
         raise InvalidEntryError(

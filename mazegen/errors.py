@@ -16,3 +16,8 @@ class InvalidFileError(InvalidConfigError):
 class InvalidArgumentError(InvalidConfigError):
     """Raised when a configuration key has an invalid or missing value."""
     pass
+
+
+class MazeSizeError(Exception):
+    """Maze is too small"""
+    pass
