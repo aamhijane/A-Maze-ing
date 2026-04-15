@@ -1,12 +1,16 @@
 from typing import Dict, Any
 from validate_config import validate
+from display import display
 from mazegen.errors import (
     InvalidEntryError,
     InvalidFileError,
     InvalidArgumentError,
+    InvalidConfigError,
+    MazeSizeError
+
 )
 from mazegen import MazeGenerator, MazeWriter
-
+import curses
 import sys
 import os
 
@@ -49,21 +53,25 @@ def main() -> None:
 
         path: str = maze.solve()
         if not path:
-            print("WARNING: No solution found for this maze.")
-
-        print("SEED", maze.get_seed())
-
+            raise InvalidConfigError(
+                "No solution found for this maze. "
+                "ENTRY/EXIT must be out of 42 pattern.")
 
         maze_writer = MazeWriter(maze, config["OUTPUT_FILE"])
         maze_writer.write()
+        curses.wrapper(display, maze)
 
     except (
             InvalidEntryError,
             InvalidFileError,
             InvalidArgumentError,
+            InvalidConfigError,
+            MazeSizeError
     ) as e:
         print(f"ERROR: {e}")
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("Exiting (sig quit)...")
 
 
 if __name__ == "__main__":

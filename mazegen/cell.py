@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 
 class Cell:
@@ -34,30 +34,17 @@ class Cell:
         self.visited: bool = False
 
     def to_hex(self) -> str:
-        """Encode the cell's wall states as a single hexadecimal character.
+        '''Convert the cell's wall configuration
+        to a single hexadecimal character.'''
 
-        Each wall maps to a bit position:
-            - North: bit 0 (LSB)
-            - East:  bit 1
-            - South: bit 2
-            - West:  bit 3 (MSB)
-
-        A closed wall (False) sets its bit to 1;
-        an open wall (True) sets it to 0.
-
-        Returns:
-            str: A single uppercase hex character (e.g., 'F', '3', 'A')
-                representing the wall configuration of the cell.
-
-        Example:
-            A cell with only North and East closed returns '3' (binary 0011).
-        """
-        HEX: str = "0123456789ABCDEF"
-        BIT_INDEX: Dict[str, int] = {"N": 0, "E": 1, "S": 2, "W": 3}
-        wall: List[str] = ["1", "1", "1", "1"]
-
-        for key, i in BIT_INDEX.items():
-            if self.walls[key]:
-                wall[i] = "0"
-
-        return HEX[int("".join(reversed(wall)), 2)]
+        hex_chars = "0123456789ABCDEF"
+        value = 0
+        if self.walls["N"]:
+            value += 1
+        if self.walls["E"]:
+            value += 2
+        if self.walls["S"]:
+            value += 4
+        if self.walls["W"]:
+            value += 8
+        return hex_chars[15 - value]
