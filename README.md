@@ -4,7 +4,7 @@
 
 # A-Maze-ing 🌀
 
-![A-Maze-ing banner](http://url/to/img.png)
+![A-Maze-ing banner](https://raw.githubusercontent.com/aamhijane/A-Maze-ing/refs/heads/main/A-Maze-ing_banner.png)
 
 ## Description
 
