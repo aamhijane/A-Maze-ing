@@ -1,17 +1,15 @@
 import random
-import sys
 from typing import List, Tuple, Optional
 from collections import deque
 from mazegen.grid import Grid
 from mazegen.cell import Cell
 from mazegen.grid import OPPOSITE
 
-
 # 42 pattern
 PATTERN_42: List[List[int]] = [
     [1, 0, 1, 0, 1, 1, 1],
     [1, 0, 1, 0, 0, 0, 1],
-    [1, 1, 1, 0, 0, 1, 0],
+    [1, 1, 1, 0, 1, 1, 1],
     [0, 0, 1, 0, 1, 0, 0],
     [0, 0, 1, 0, 1, 1, 1],
 ]
@@ -55,20 +53,18 @@ class MazeGenerator:
         self.perfect: bool = perfect
         self.entry_point: Tuple[int, int] = entry_point
         self.exit_point: Tuple[int, int] = exit_point
-
-        if self.seed is None:
-            self.seed = random.randint(0, 999)
-
-        random.seed(self.seed)
-
+        if self.seed is not None:
+            random.seed(self.seed)
         self.grid: Grid = Grid(self.width, self.height)
 
         self.stack: List[Cell] = [
             self.grid.get_cell(self.entry_point[0], self.entry_point[1])
         ]
         self.stack[0].visited = True
-
-        self._embed_42()
+        self.is_small = True
+        if self.height >= len(PATTERN_42) and self.width >= len(PATTERN_42[0]):
+            self._embed_42()
+            self.is_small = False
         self._generate()
 
         if not self.perfect:
@@ -116,7 +112,7 @@ class MazeGenerator:
                 if (neighbor not in visited
                         and top_x <= neighbor.x < top_x + 3
                         and top_y <= neighbor.y < top_y + 3
-                        and current.walls[direction]):
+                        and not current.walls[direction]):
                     visited.add(neighbor)
                     queue.append(neighbor)
 
@@ -205,19 +201,15 @@ class MazeGenerator:
         pattern_h: int = len(PATTERN_42)
         pattern_w: int = len(PATTERN_42[0])
 
-        if self.width < pattern_w + 4 or self.height < pattern_h + 4:
-            print("ERROR: Maze is too small to embed the '42' pattern.")
-            sys.exit(0)
-
-        start_x: int = (self.width - pattern_w) // 2
-        start_y: int = (self.height - pattern_h) // 2
+        self.start_x: int = (self.width - pattern_w) // 2
+        self.start_y: int = (self.height - pattern_h) // 2
 
         for row_i, row in enumerate(PATTERN_42):
             for col_i, cell_val in enumerate(row):
                 if cell_val == 1:
                     cell: Cell = self.grid.get_cell(
-                        start_x + col_i,
-                        start_y + row_i
+                        self.start_x + col_i,
+                        self.start_y + row_i
                     )
                     # Force all walls closed on the "42" cell
                     cell.walls = {
@@ -278,6 +270,3 @@ class MazeGenerator:
                     queue.append((neighbor, path + [direction]))
 
         return ""
-
-    def get_seed(self) -> int:
-        return self.seed
